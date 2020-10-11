@@ -103,8 +103,6 @@ namespace Uno_Muliplayer
 
             bool completeRound = false;
 
-            
-
             while (!completeRound && players[0].playerState != player.State.DONE)
             {
                 Console.Clear();
@@ -114,14 +112,11 @@ namespace Uno_Muliplayer
 
                 string playerChoiceString = players[0].playerAction(); //Returns the player chooses and want play
                 
-
-
-
-                if (playerChoiceString.ToLower() == "p") 
+                if (playerChoiceString.ToLower() == "p") ////Checks if player can picks up cards
                 {
                     givPlayerCards(1,0);
                 }
-                else if (playerChoiceString.ToLower() == "d") 
+                else if (playerChoiceString.ToLower() == "d" && ActionDeck.Count > 0) //Checks if player can end the round
                 {
                     players.Add(players[0]);
                     players.RemoveAt(0);
@@ -129,60 +124,70 @@ namespace Uno_Muliplayer
 
                     for (int i = 0; i <= ActionDeck.Count; i++)
                     {
-                        cardAction(ActionDeck[i]);
-                        ActionDeck.RemoveAt(i);
+                        cardAction(ActionDeck[0]);
+                        ActionDeck.RemoveAt(0);
                     }
 
                     completeRound = true;
-
-
-                    var _temp = players[0];
-
-                    
-
-                    currentPlayer++;
                 }
-                else 
+                else if (int.TryParse(playerChoiceString, out int playerChoiceInt)) //Checks if player have choose a number
                 {
-                    int playerChoiceInt = Convert.ToInt32(playerChoiceString) - 1;
-                    if (players[0].playerCards[playerChoiceInt].ColorState == currentCard.ColorState || players[0].playerCards[playerChoiceInt].ColorState == cards.colorState.NULL || players[0].playerCards[playerChoiceInt].number == currentCard.number)
+
+                    playerChoiceInt -= 1;
+                    if (playerChoiceInt >= 0 && playerChoiceInt <= players[0].playerCards.Count)
                     {
-                        playedDeck.Add(players[0].playerCards[playerChoiceInt]);
-
-                        ActionDeck.Add(players[0].playerCards[playerChoiceInt]);
-
-                        currentCard = playedDeck[playedDeck.Count - 1];
-
-                        players[0].removeCard(players[0].playerCards[playerChoiceInt]);
-
-                        if (players[0].playerCards.Count == 0)
+                        if (players[0].playerCards[playerChoiceInt].ColorState == currentCard.ColorState || players[0].playerCards[playerChoiceInt].ColorState == cards.colorState.NULL || players[0].playerCards[playerChoiceInt].number == currentCard.number)
                         {
-                            players[0].playerState = player.State.DONE;
+                            playedDeck.Add(players[0].playerCards[playerChoiceInt]);
 
-                            if (winner == null) 
+                            ActionDeck.Add(players[0].playerCards[playerChoiceInt]);
+
+                            currentCard = playedDeck[playedDeck.Count - 1];
+
+                            players[0].removeCard(players[0].playerCards[playerChoiceInt]);
+
+                            if (players[0].playerCards.Count == 0)
                             {
-                                winner = players[0];
+                                players[0].playerState = player.State.DONE;
+
+                                if (winner == null)
+                                {
+                                    winner = players[0];
+                                }
                             }
                         }
+                        else
+                        {
+
+                            Console.WriteLine("");
+                            Console.WriteLine("");
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("You can not play the card");
+                            Console.ForegroundColor = ConsoleColor.White;
+                            Console.WriteLine("Please play another card");
+                            Thread.Sleep(900);
+                        }
                     }
-                    else
+                    else 
                     {
-                        
                         Console.WriteLine("");
                         Console.WriteLine("");
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("You can not play the card");
+                        Console.WriteLine("That card does are not in your deck");
                         Console.ForegroundColor = ConsoleColor.White;
                         Console.WriteLine("Please play another card");
-                        Thread.Sleep(700);
+                        Thread.Sleep(900);
                     }
+                    
+                    
                 }
-            }
-
-
-            if (currentPlayer >= players.Count)
-            {
-                currentPlayer = 0;
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("You have to play a card before you can end the round");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Thread.Sleep(900);
+                }
             }
         }
 
@@ -204,7 +209,7 @@ namespace Uno_Muliplayer
                     players.Reverse();
                     break;
                 case cards.cardType.SKIP:
-                    players.Add(players[players.Count - 1]);
+                    players.Add(players[0]);
                     players.RemoveAt(0);
                     break;
                 default:
