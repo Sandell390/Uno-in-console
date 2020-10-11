@@ -68,6 +68,11 @@ namespace Uno_Muliplayer
             currentDeck.Remove(currentDeck[0]);
 
             currentCard = playedDeck[0];
+
+            if (currentCard.ColorState == cards.colorState.NULL) 
+            {
+                currentCard.ColorState = (cards.colorState)random.Next(0, 3);
+            }
         }
 
         public void showDeck() 
@@ -100,24 +105,28 @@ namespace Uno_Muliplayer
 
             
 
-            while (!completeRound && players[currentPlayer].playerState != player.State.DONE)
+            while (!completeRound && players[0].playerState != player.State.DONE)
             {
                 Console.Clear();
                 playedDeck[playedDeck.Count - 1].showCard();
                 Console.WriteLine("");
                 Console.WriteLine("");
 
-                string playerChoiceString = players[currentPlayer].playerAction(); //Returns the player chooses and want play
+                string playerChoiceString = players[0].playerAction(); //Returns the player chooses and want play
                 
 
 
 
                 if (playerChoiceString.ToLower() == "p") 
                 {
-                    givPlayerCards(1,currentPlayer);
+                    givPlayerCards(1,0);
                 }
                 else if (playerChoiceString.ToLower() == "d") 
                 {
+                    players.Add(players[0]);
+                    players.RemoveAt(0);
+
+
                     for (int i = 0; i <= ActionDeck.Count; i++)
                     {
                         cardAction(ActionDeck[i]);
@@ -125,28 +134,34 @@ namespace Uno_Muliplayer
                     }
 
                     completeRound = true;
+
+
+                    var _temp = players[0];
+
+                    
+
                     currentPlayer++;
                 }
                 else 
                 {
                     int playerChoiceInt = Convert.ToInt32(playerChoiceString) - 1;
-                    if (players[currentPlayer].playerCards[playerChoiceInt].ColorState == currentCard.ColorState || players[currentPlayer].playerCards[playerChoiceInt].ColorState == cards.colorState.NULL || players[currentPlayer].playerCards[playerChoiceInt].number == currentCard.number)
+                    if (players[0].playerCards[playerChoiceInt].ColorState == currentCard.ColorState || players[0].playerCards[playerChoiceInt].ColorState == cards.colorState.NULL || players[0].playerCards[playerChoiceInt].number == currentCard.number)
                     {
-                        playedDeck.Add(players[currentPlayer].playerCards[playerChoiceInt]);
+                        playedDeck.Add(players[0].playerCards[playerChoiceInt]);
 
-                        ActionDeck.Add(players[currentPlayer].playerCards[playerChoiceInt]);
+                        ActionDeck.Add(players[0].playerCards[playerChoiceInt]);
 
                         currentCard = playedDeck[playedDeck.Count - 1];
 
-                        players[currentPlayer].removeCard(players[currentPlayer].playerCards[playerChoiceInt]);
+                        players[0].removeCard(players[0].playerCards[playerChoiceInt]);
 
-                        if (players[currentPlayer].playerCards.Count == 0)
+                        if (players[0].playerCards.Count == 0)
                         {
-                            players[currentPlayer].playerState = player.State.DONE;
+                            players[0].playerState = player.State.DONE;
 
                             if (winner == null) 
                             {
-                                winner = players[currentPlayer];
+                                winner = players[0];
                             }
                         }
                     }
@@ -176,20 +191,21 @@ namespace Uno_Muliplayer
             switch (card.CardType)
             {
                 case cards.cardType.PLUS2:
-                    givPlayerCards(2,currentPlayer + 1);
+                    givPlayerCards(2,0);
                     break;
                 case cards.cardType.PLUS4:
-                    givPlayerCards(4, currentPlayer + 1);
-                    currentCard.ColorState = (cards.colorState)players[currentPlayer].switchColor();
+                    givPlayerCards(4,0);
+                    currentCard.ColorState = (cards.colorState)players[0].switchColor();
                     break;
                 case cards.cardType.SWICTH_COLOR:
-                    currentCard.ColorState = (cards.colorState)players[currentPlayer].switchColor();
+                    currentCard.ColorState = (cards.colorState)players[0].switchColor();
                     break;
                 case cards.cardType.REVERSE:
                     players.Reverse();
                     break;
                 case cards.cardType.SKIP:
-                    currentPlayer =+ 2;
+                    players.Add(players[players.Count - 1]);
+                    players.RemoveAt(0);
                     break;
                 default:
                     Console.WriteLine("Can not do any actions on the card");
