@@ -43,7 +43,6 @@ namespace Uno_Muliplayer
                     for (int j = 1; j < 10; j++)
                     {
                         currentDeck.Add(new cards((cards.colorState)i, cards.cardType.NUMBER, j)); //Number 1-9 Card
-                        currentDeck.Add(new cards((cards.colorState)i, cards.cardType.REVERSE));
                     }
 
                     currentDeck.Add(new cards((cards.colorState)i, cards.cardType.SKIP)); //Skip card

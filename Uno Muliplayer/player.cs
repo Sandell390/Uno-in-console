@@ -68,7 +68,7 @@ namespace Uno_Muliplayer
             Console.WriteLine();
             for (int i = 0; i < playerCards.Count; i++)
             {
-                Console.Write($"  {i + 1}  ");
+                Console.Write($"  {i + 1} ");
             }
             Console.WriteLine();
         }
