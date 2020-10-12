@@ -43,6 +43,7 @@ namespace Uno_Muliplayer
                     for (int j = 1; j < 10; j++)
                     {
                         currentDeck.Add(new cards((cards.colorState)i, cards.cardType.NUMBER, j)); //Number 1-9 Card
+                        currentDeck.Add(new cards((cards.colorState)i, cards.cardType.REVERSE));
                     }
 
                     currentDeck.Add(new cards((cards.colorState)i, cards.cardType.SKIP)); //Skip card
@@ -118,8 +119,7 @@ namespace Uno_Muliplayer
                 }
                 else if (playerChoiceString.ToLower() == "d" && ActionDeck.Count > 0) //Checks if player can end the round
                 {
-                    players.Add(players[0]);
-                    players.RemoveAt(0);
+                    putPlayerLastInList();
 
 
                     for (int i = 0; i <= ActionDeck.Count; i++)
@@ -191,6 +191,12 @@ namespace Uno_Muliplayer
             }
         }
 
+        void putPlayerLastInList() 
+        {
+            players.Add(players[0]);
+            players.RemoveAt(0);
+        }
+
         void cardAction(cards card) 
         {
             switch (card.CardType)
@@ -207,10 +213,10 @@ namespace Uno_Muliplayer
                     break;
                 case cards.cardType.REVERSE:
                     players.Reverse();
+                    putPlayerLastInList();
                     break;
                 case cards.cardType.SKIP:
-                    players.Add(players[0]);
-                    players.RemoveAt(0);
+                    putPlayerLastInList();
                     break;
                 default:
                     Console.WriteLine("Can not do any actions on the card");
