@@ -94,7 +94,7 @@ namespace Uno_Muliplayer
         {
             if (CardType == cardType.NUMBER) 
             {
-                Console.Write($" |{number}| ");
+                Console.Write($" |{number}|  ");
             }
             else 
             {
