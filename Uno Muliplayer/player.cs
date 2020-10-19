@@ -57,6 +57,31 @@ namespace Uno_Muliplayer
             return playerChoice;
         }
 
+        public string playerStackCard(cards card) 
+        {
+            List<cards> StackingCards = new List<cards>();
+            for (int i = 0; i < playerCards.Count; i++)
+            {
+                if (playerCards[i].CardType == card.CardType)
+                {
+                    StackingCards.Add(playerCards[i]);
+                }
+            }
+
+            Console.WriteLine("Choose the card(s) if you want to continue the stacking or type p to pick cards up");
+
+            for (int i = 0; i < StackingCards.Count; i++)
+            {
+                StackingCards[i].showCard();
+            }
+            for (int i = 0; i < StackingCards.Count; i++)
+            {
+                Console.Write($"  {i + 1}  ");
+            }
+            string playerChoice = Console.ReadLine();
+
+            return playerChoice;
+        }
         void ShowPlayerCards() 
         {
             Console.WriteLine($"Player Number: {playerNumber}");

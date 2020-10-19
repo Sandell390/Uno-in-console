@@ -52,8 +52,8 @@ namespace Uno_Muliplayer
         public enum cardType
         {
             NUMBER,
-            PLUS2,
-            PLUS4,
+            PLUS2 = 2,
+            PLUS4 = 4,
             SWICTH_COLOR,
             REVERSE,
             SKIP,
