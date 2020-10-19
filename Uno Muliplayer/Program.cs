@@ -26,10 +26,8 @@ namespace Uno_Muliplayer
 
                 for (int i = 0; i < playerCount; i++)
                 {
-                    table.givPlayerCards(7, i);
+                    table.givPlayerCards(20, i);
                 }
-
-                
 
                 bool stillGaming = true;
                 while (stillGaming) 

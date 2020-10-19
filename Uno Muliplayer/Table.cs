@@ -88,7 +88,8 @@ namespace Uno_Muliplayer
 
             if (amount > currentDeck.Count) 
             {
-                currentDeck.AddRange(playedDeck.GetRange(0,playedDeck.Count - 1));
+                currentDeck.AddRange(playedDeck.GetRange(1,playedDeck.Count - 1));
+                playedDeck.RemoveRange(0, playedDeck.Count - 1);
             }
             for (int i = 0; i < amount; i++)
             {
@@ -106,13 +107,19 @@ namespace Uno_Muliplayer
             while (!completeRound && players[0].playerState != player.State.DONE)
             {
                 Console.Clear();
+
+                Console.WriteLine($"current Deck: {currentDeck.Count}");
+                Console.WriteLine($"Played deck: {playedDeck.Count}");
+
+                Console.WriteLine("");
+                Console.WriteLine("");
                 playedDeck[playedDeck.Count - 1].showCard();
                 Console.WriteLine("");
                 Console.WriteLine("");
 
                 string playerChoiceString = players[0].playerAction(); //Returns the player chooses and want play
                 
-                if (playerChoiceString.ToLower() == "p") ////Checks if player can picks up cards
+                if (playerChoiceString.ToLower() == "p") //Checks if player can picks up cards
                 {
                     givPlayerCards(1,0);
                 }
@@ -121,11 +128,12 @@ namespace Uno_Muliplayer
                     putPlayerLastInList();
 
 
-                    for (int i = 0; i <= ActionDeck.Count; i++)
+                    for (int i = 0; i < ActionDeck.Count; i++)
                     {
-                        cardAction(ActionDeck[0]);
-                        ActionDeck.RemoveAt(0);
+                        cardAction(ActionDeck[i]);
+                        
                     }
+                    ActionDeck.Clear();
 
                     completeRound = true;
                 }
@@ -155,7 +163,7 @@ namespace Uno_Muliplayer
                                 }
                             }
                         }
-                        else
+                        else //If the player dont play the right card then an error shows to the player
                         {
 
                             Console.WriteLine("");
@@ -167,7 +175,7 @@ namespace Uno_Muliplayer
                             Thread.Sleep(900);
                         }
                     }
-                    else 
+                    else //If the player dont do the right thing then an error shows to the player
                     {
                         Console.WriteLine("");
                         Console.WriteLine("");
@@ -180,7 +188,7 @@ namespace Uno_Muliplayer
                     
                     
                 }
-                else
+                else //Player have to play a card or an option
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("You have to play a card before you can end the round");
@@ -211,8 +219,9 @@ namespace Uno_Muliplayer
                     currentCard.ColorState = (cards.colorState)players[0].switchColor();
                     break;
                 case cards.cardType.REVERSE:
-                    players.Reverse();
-                    putPlayerLastInList();
+                    if (players.Count == 2) players.Reverse(0, players.Count);
+
+                    else players.Reverse(0, players.Count - 1);
                     break;
                 case cards.cardType.SKIP:
                     putPlayerLastInList();

@@ -68,7 +68,20 @@ namespace Uno_Muliplayer
             Console.WriteLine();
             for (int i = 0; i < playerCards.Count; i++)
             {
-                Console.Write($"  {i + 1} ");
+                
+                if (i >= 10) //If the card has 2 charaters 
+                {
+                    Console.Write($"  {i + 1} ");
+                }
+                else if(playerCards[i].extraSpace) //If the player have over 10 cards
+                {
+                    Console.Write($"   {i + 1}  ");
+                }
+                else //If the player have under 10 cards
+                {
+                    Console.Write($"  {i + 1}  ");
+                }
+                
             }
             Console.WriteLine();
         }

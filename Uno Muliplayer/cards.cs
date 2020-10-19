@@ -11,6 +11,7 @@ namespace Uno_Muliplayer
         public colorState ColorState { get; set; }
         public cardType CardType { get; set; }
         public int number { get; set; }
+        public bool extraSpace { get; set; }
 
         public cards(colorState color = colorState.NULL, cardType type = cardType.NULL, int _number = -1)
         {
@@ -18,6 +19,7 @@ namespace Uno_Muliplayer
             ColorState = color;
             CardType = type;
             number = _number;
+            extraSpace = false;
 
             switch (CardType) 
             {
@@ -94,7 +96,7 @@ namespace Uno_Muliplayer
         {
             if (CardType == cardType.NUMBER) 
             {
-                Console.Write($" |{number}|  ");
+                Console.Write($" |{number}| ");
             }
             else 
             {
@@ -107,9 +109,11 @@ namespace Uno_Muliplayer
             switch (CardType)
             {
                 case cardType.PLUS2:
+                    extraSpace = true;
                     return "+2";
                     
                 case cardType.PLUS4:
+                    extraSpace = true;
                     return "+4";
                    
                 case cardType.SWICTH_COLOR:
