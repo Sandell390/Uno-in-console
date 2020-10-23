@@ -84,7 +84,7 @@ namespace Uno_Muliplayer
             }
         }
 
-        public void givPlayerCards(int amount, int playerNumber) 
+        public void givPlayerCards(int amount, int playerNumber) //Giving the player cards and switchs the decks around when current deck is low
         {
 
             if (amount > currentDeck.Count) 
@@ -104,7 +104,15 @@ namespace Uno_Muliplayer
             {
                 players[playerNumber].addCard(currentDeck[0]);
                 currentDeck.RemoveAt(0);
+
+                
             }
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("");
+            Console.WriteLine($"Added {amount} cards to Player {players[playerNumber].playerNumber}");
+            Console.ForegroundColor = ConsoleColor.White;
+            Thread.Sleep(500);
         }
 
         public void NextRoud()
@@ -134,6 +142,10 @@ namespace Uno_Muliplayer
                 {
                     givPlayerCards(1,0);
                 }
+                else if (playerChoiceString.ToLower() == "u") 
+                {
+                    players[0].setUNO();
+                }
                 else if (playerChoiceString.ToLower() == "d" && ActionDeck.Count > 0) //Checks if player can end the round
                 {
                     putPlayerLastInList();
@@ -159,11 +171,11 @@ namespace Uno_Muliplayer
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("You have to play a card before you can end the round");
                     Console.ForegroundColor = ConsoleColor.White;
-                    Thread.Sleep(900);
+                    Thread.Sleep(1100);
                 }
             }
         }
-        void processingRound(int playerChoiceInt) 
+        void processingRound(int playerChoiceInt) //When the player have entered a number then it checks if the number/card is right 
         {
             playerChoiceInt -= 1;
             if (playerChoiceInt >= 0 && playerChoiceInt <= players[0].playerCards.Count - 1)
@@ -172,7 +184,7 @@ namespace Uno_Muliplayer
                 {
                     moveCards(playerChoiceInt);
                 }
-                else if (players[0].playerCards[playerChoiceInt].ColorState == currentCard.ColorState || players[0].playerCards[playerChoiceInt].ColorState == cards.colorState.NULL || players[0].playerCards[playerChoiceInt].number == currentCard.number && !stackCard)
+                else if (!stackCard && players[0].playerCards[playerChoiceInt].ColorState == currentCard.ColorState || players[0].playerCards[playerChoiceInt].ColorState == cards.colorState.NULL || players[0].playerCards[playerChoiceInt].number == currentCard.number)
                 {
                     moveCards(playerChoiceInt);
                     stackCard = true;
@@ -197,17 +209,11 @@ namespace Uno_Muliplayer
             Console.WriteLine("Please play another card");
             Thread.Sleep(900);
         }
-        void moveCards(int playerChoiceInt) 
+        void moveCards(int playerChoiceInt) //Moving the cards around to the lists 
         {
-            playedDeck.Add(players[0].playerCards[playerChoiceInt]);
+            //The player not win now
 
-            ActionDeck.Add(players[0].playerCards[playerChoiceInt]);
-
-            currentCard = playedDeck[playedDeck.Count - 1];
-
-            players[0].removeCard(players[0].playerCards[playerChoiceInt]);
-
-            if (players[0].playerCards.Count == 0)
+            if (players[0].playerCards.Count == 0 && players[0].playerState == player.State.UNO)
             {
                 players[0].playerState = player.State.DONE;
 
@@ -215,9 +221,24 @@ namespace Uno_Muliplayer
                 {
                     winner = players[0];
                 }
+                
+            }
+            else if (players[0].playerState == player.State.UNO && players[0].playerCards.Count > 1)  
+            {
+                givPlayerCards(1,0);
+            }
+            else 
+            {
+                playedDeck.Add(players[0].playerCards[playerChoiceInt]);
+
+                ActionDeck.Add(players[0].playerCards[playerChoiceInt]);
+
+                currentCard = playedDeck[playedDeck.Count - 1];
+
+                players[0].removeCard(players[0].playerCards[playerChoiceInt]);
             }
         }
-        void putPlayerLastInList() 
+        void putPlayerLastInList() //Switchs the next player to index 0 
         {
             players.Add(players[0]);
             players.RemoveAt(0);
@@ -257,15 +278,16 @@ namespace Uno_Muliplayer
         {
             bool playerStackCard = false;
 
-            for (int i = 0; i < players[0].playerCards.Count; i++)
+            for (int i = 0; i < players[0].playerCards.Count; i++)  //Checks if the player has some 4plus or 2plus
             {
                 if (players[0].playerCards[i].CardType == currentCard.CardType) 
                 {
                     playerStackCard = true;
+                    stackCard = true;
                 }
             }
 
-            if (!playerStackCard) 
+            if (!playerStackCard) //If they dont have them then the amout of cards is giving to the player
             {
                 givPlayerCards(stackCardAmount, 0);
                 playerStackCard = false;

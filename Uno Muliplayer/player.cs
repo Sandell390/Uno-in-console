@@ -12,10 +12,12 @@ namespace Uno_Muliplayer
         public  int playerNumber { get; set; }
         public List<cards> playerCards { get; set; }
         public State playerState { get; set; }
+       
         
         public enum State
         {
             ACTIVE,
+            UNO,
             DONE
         }
 
@@ -48,6 +50,8 @@ namespace Uno_Muliplayer
             Console.WriteLine("Options: ");
             Console.WriteLine("Type 'p' for picking up a card");
             Console.WriteLine("Type 'd' for end round");
+
+            CheckUno();
             //Let the player choose card
 
 
@@ -55,6 +59,24 @@ namespace Uno_Muliplayer
             string playerChoice = Console.ReadLine();
 
             return playerChoice;
+        }
+
+        public void setUNO() 
+        {
+            playerState = State.UNO;
+        }
+        public void CheckUno() 
+        { 
+
+            if (playerCards.Count == 1 && playerState == State.ACTIVE) 
+            {
+                Console.WriteLine("Type 'u' for call UNO");
+            }
+            
+            if (playerCards.Count > 1) 
+            {
+                playerState = State.ACTIVE;
+            }
         }
         void ShowPlayerCards() 
         {
