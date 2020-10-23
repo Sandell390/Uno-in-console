@@ -29,6 +29,8 @@ namespace Uno_Muliplayer
                     table.givPlayerCards(7, i);
                 }
 
+                
+
                 bool stillGaming = true;
                 while (stillGaming) 
                 {

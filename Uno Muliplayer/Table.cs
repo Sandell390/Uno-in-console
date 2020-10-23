@@ -15,7 +15,9 @@ namespace Uno_Muliplayer
         public List<cards> ActionDeck { get; set; }
         public cards currentCard { get; set; }
         public player winner { get; set; }
-        public int stackedCards { get; set; }
+        public int stackCardAmount { get; set; }
+
+        public bool stackCard { get; set; }
 
         Random random;
 
@@ -30,7 +32,6 @@ namespace Uno_Muliplayer
             playedDeck = new List<cards>();
             ActionDeck = new List<cards>();
             random = new Random();
-            stackedCards = 0;
             winner = null;
         }
 
@@ -90,6 +91,14 @@ namespace Uno_Muliplayer
             {
                 currentDeck.AddRange(playedDeck.GetRange(1,playedDeck.Count - 1));
                 playedDeck.RemoveRange(0, playedDeck.Count - 1);
+
+                for (int i = 0; i < currentDeck.Count; i++)
+                {
+                    if (currentDeck[i].CardType == cards.cardType.PLUS4 || currentDeck[i].CardType == cards.cardType.SWICTH_COLOR) 
+                    {
+                        currentDeck[i].ColorState = cards.colorState.NULL;
+                    }
+                }
             }
             for (int i = 0; i < amount; i++)
             {
@@ -119,6 +128,8 @@ namespace Uno_Muliplayer
 
                 string playerChoiceString = players[0].playerAction(); //Returns the player chooses and want play
                 
+                //If the player can stack more cards then a system will detect it and will limit the cards
+                 
                 if (playerChoiceString.ToLower() == "p") //Checks if player can picks up cards
                 {
                     givPlayerCards(1,0);
@@ -136,6 +147,7 @@ namespace Uno_Muliplayer
                     ActionDeck.Clear();
 
                     completeRound = true;
+                    stackCard = false;
                 }
                 else if (int.TryParse(playerChoiceString, out int playerChoiceInt)) //Checks if player have choose a number
                 {
@@ -151,53 +163,58 @@ namespace Uno_Muliplayer
                 }
             }
         }
-
         void processingRound(int playerChoiceInt) 
         {
             playerChoiceInt -= 1;
-            if (playerChoiceInt >= 0 && playerChoiceInt <= players[0].playerCards.Count)
+            if (playerChoiceInt >= 0 && playerChoiceInt <= players[0].playerCards.Count - 1)
             {
-                if (players[0].playerCards[playerChoiceInt].ColorState == currentCard.ColorState || players[0].playerCards[playerChoiceInt].ColorState == cards.colorState.NULL || players[0].playerCards[playerChoiceInt].number == currentCard.number)
+                if (stackCard && players[0].playerCards[playerChoiceInt].number == currentCard.number) 
                 {
-                    playedDeck.Add(players[0].playerCards[playerChoiceInt]);
-
-                    ActionDeck.Add(players[0].playerCards[playerChoiceInt]);
-
-                    currentCard = playedDeck[playedDeck.Count - 1];
-
-                    players[0].removeCard(players[0].playerCards[playerChoiceInt]);
-
-                    if (players[0].playerCards.Count == 0)
-                    {
-                        players[0].playerState = player.State.DONE;
-
-                        if (winner == null)
-                        {
-                            winner = players[0];
-                        }
-                    }
+                    moveCards(playerChoiceInt);
+                }
+                else if (players[0].playerCards[playerChoiceInt].ColorState == currentCard.ColorState || players[0].playerCards[playerChoiceInt].ColorState == cards.colorState.NULL || players[0].playerCards[playerChoiceInt].number == currentCard.number && !stackCard)
+                {
+                    moveCards(playerChoiceInt);
+                    stackCard = true;
                 }
                 else //If the player dont play the right card then an error shows to the player
                 {
-
-                    Console.WriteLine("");
-                    Console.WriteLine("");
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("You can not play the card");
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.WriteLine("Please play another card");
-                    Thread.Sleep(900);
+                    Error();
                 }
             }
             else //If the player dont do the right thing then an error shows to the player
             {
-                Console.WriteLine("");
-                Console.WriteLine("");
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("That card does are not in your deck");
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("Please play another card");
-                Thread.Sleep(900);
+                Error();
+            }
+        }
+        void Error() 
+        {
+            Console.WriteLine("");
+            Console.WriteLine("");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("You can not play the card");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("Please play another card");
+            Thread.Sleep(900);
+        }
+        void moveCards(int playerChoiceInt) 
+        {
+            playedDeck.Add(players[0].playerCards[playerChoiceInt]);
+
+            ActionDeck.Add(players[0].playerCards[playerChoiceInt]);
+
+            currentCard = playedDeck[playedDeck.Count - 1];
+
+            players[0].removeCard(players[0].playerCards[playerChoiceInt]);
+
+            if (players[0].playerCards.Count == 0)
+            {
+                players[0].playerState = player.State.DONE;
+
+                if (winner == null)
+                {
+                    winner = players[0];
+                }
             }
         }
         void putPlayerLastInList() 
@@ -211,11 +228,13 @@ namespace Uno_Muliplayer
             switch (card.CardType)
             {
                 case cards.cardType.PLUS2:
-                    stackedCards += 2;
+                    stackCardAmount += 2;
+                    stack();
                     break;
                 case cards.cardType.PLUS4:
-                    stackedCards += 4;
+                    stackCardAmount += 4;
                     currentCard.ColorState = (cards.colorState)players[0].switchColor();
+                    stack();
                     break;
                 case cards.cardType.SWICTH_COLOR:
                     currentCard.ColorState = (cards.colorState)players[0].switchColor();
@@ -234,33 +253,23 @@ namespace Uno_Muliplayer
             }
         }
 
-        void stackCard(cards card)  //Virker ikke, Skal lige have tænkt det godt igennem
+        void stack() 
         {
-            bool canPlayerStack = false;
-            string playerChoice;
+            bool playerStackCard = false;
 
             for (int i = 0; i < players[0].playerCards.Count; i++)
             {
-                if (players[0].playerCards[i].CardType == card.CardType) 
+                if (players[0].playerCards[i].CardType == currentCard.CardType) 
                 {
-                    canPlayerStack = true; 
-                    
+                    playerStackCard = true;
                 }
             }
 
-            if (canPlayerStack) 
+            if (!playerStackCard) 
             {
-                playerChoice = players[0].playerStackCard(card);
-
-                if (playerChoice.ToLower() == "d") 
-                {
-                    givPlayerCards(stackedCards,0);
-                }
-                else if (int.TryParse(playerChoice, out int playerChoiceInt)) //Checks if player have choose a number
-                {
-                    processingRound(playerChoiceInt);
-
-                }
+                givPlayerCards(stackCardAmount, 0);
+                playerStackCard = false;
+                stackCardAmount = 0;
             }
         }
 
