@@ -108,7 +108,7 @@ namespace Uno_Muliplayer
                 
             }
 
-            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("");
             Console.WriteLine($"Added {amount} cards to Player {players[playerNumber].playerNumber}");
             Console.ForegroundColor = ConsoleColor.White;
@@ -211,21 +211,22 @@ namespace Uno_Muliplayer
         }
         void moveCards(int playerChoiceInt) //Moving the cards around to the lists 
         {
-            //The player not win now
+            
 
-            if (players[0].playerCards.Count == 0 && players[0].playerState == player.State.UNO)
+            
+            if (players[0].playerState == player.State.ACTIVE && players[0].playerCards.Count == 1)  
             {
-                players[0].playerState = player.State.DONE;
+                Console.WriteLine("");
+                Console.WriteLine("");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("You forgot to call UNO");
+                Console.WriteLine("Have fun with your new card");
+                Console.ForegroundColor = ConsoleColor.White;
+                Thread.Sleep(1100);
 
-                if (winner == null)
-                {
-                    winner = players[0];
-                }
-                
-            }
-            else if (players[0].playerState == player.State.UNO && players[0].playerCards.Count > 1)  
-            {
+
                 givPlayerCards(1,0);
+                putPlayerLastInList();
             }
             else 
             {
@@ -236,6 +237,17 @@ namespace Uno_Muliplayer
                 currentCard = playedDeck[playedDeck.Count - 1];
 
                 players[0].removeCard(players[0].playerCards[playerChoiceInt]);
+            }
+
+            if (players[0].playerCards.Count == 0 && players[0].playerState == player.State.UNO)
+            {
+                players[0].playerState = player.State.DONE;
+
+                if (winner == null)
+                {
+                    winner = players[0];
+                }
+
             }
         }
         void putPlayerLastInList() //Switchs the next player to index 0 
