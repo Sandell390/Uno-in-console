@@ -298,7 +298,7 @@ namespace Uno_Muliplayer
                     stackCard = true;
                 }
             }
-
+            //Hej det er en test
             if (!playerStackCard) //If they dont have them then the amout of cards is giving to the player
             {
                 givPlayerCards(stackCardAmount, 0);
